@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -34,7 +35,11 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RouteListScreen(onOpenRoute: (Long) -> Unit, onBack: () -> Unit) {
+fun RouteListScreen(
+    onOpenRoute: (Long) -> Unit,
+    onOpenAll: () -> Unit,
+    onBack: () -> Unit,
+) {
     val vm: RouteListViewModel = viewModel()
     val routes by vm.routes.collectAsStateWithLifecycle()
 
@@ -45,6 +50,11 @@ fun RouteListScreen(onOpenRoute: (Long) -> Unit, onBack: () -> Unit) {
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onOpenAll, enabled = routes.isNotEmpty()) {
+                        Icon(Icons.Default.Layers, contentDescription = "Show all on map")
                     }
                 }
             )

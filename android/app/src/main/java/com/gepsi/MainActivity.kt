@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.gepsi.ui.AllRoutesScreen
 import com.gepsi.ui.MapScreen
 import com.gepsi.ui.RouteDetailScreen
 import com.gepsi.ui.RouteListScreen
@@ -30,8 +31,12 @@ class MainActivity : ComponentActivity() {
                         composable("routes") {
                             RouteListScreen(
                                 onOpenRoute = { id -> nav.navigate("routes/$id") },
+                                onOpenAll = { nav.navigate("routes/all") },
                                 onBack = { nav.popBackStack() }
                             )
+                        }
+                        composable("routes/all") {
+                            AllRoutesScreen(onBack = { nav.popBackStack() })
                         }
                         composable("routes/{routeId}") { entry ->
                             val id = entry.arguments?.getString("routeId")?.toLongOrNull() ?: return@composable

@@ -38,3 +38,22 @@ logs/
 coverage/
 .coverage
 *.lcov
+
+# Android
+android/.gradle/
+android/local.properties
+android/.idea/
+android/build/
+android/app/build/
+android/captures/
+*.apk
+*.aab
+*.iml
+.cxx/
+android/keystore.properties
+android/gepsi-release.jks
+
+# Backend
+backend/instance/
+backend/uploads/
+

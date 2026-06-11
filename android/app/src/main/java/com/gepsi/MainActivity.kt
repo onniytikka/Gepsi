@@ -18,6 +18,7 @@ import com.gepsi.ui.ImportDialog
 import com.gepsi.ui.MapScreen
 import com.gepsi.ui.RouteDetailScreen
 import com.gepsi.ui.RouteListScreen
+import com.gepsi.update.UpdatePrompt
 
 class MainActivity : ComponentActivity() {
 
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
                     pendingImport.value?.let { uri ->
                         ImportDialog(uri = uri, onDone = { pendingImport.value = null })
                     }
+
+                    UpdatePrompt()
                 }
             }
         }

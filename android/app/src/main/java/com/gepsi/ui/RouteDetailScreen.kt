@@ -2,28 +2,24 @@ package com.gepsi.ui
 
 import android.app.Application
 import android.graphics.Color
-import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -84,7 +80,7 @@ fun RouteDetailScreen(routeId: Long, onBack: () -> Unit) {
     val route by vm.route.collectAsStateWithLifecycle()
     val points by vm.points.collectAsStateWithLifecycle()
     val notes by vm.notes.collectAsStateWithLifecycle()
-    var selectedNote by remember { mutableStateOf<Note?>(null) }
+    var selectedNoteId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     val mapView = remember {
         MapView(ctx).apply {
@@ -127,7 +123,7 @@ fun RouteDetailScreen(routeId: Long, onBack: () -> Unit) {
                 setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                 title = n.text ?: "Voice note"
                 setOnMarkerClickListener { _, _ ->
-                    selectedNote = n
+                    selectedNoteId = n.id
                     true
                 }
             }
@@ -156,56 +152,7 @@ fun RouteDetailScreen(routeId: Long, onBack: () -> Unit) {
         }
     }
 
-    selectedNote?.let { n ->
-        NoteDialog(note = n, onDismiss = { selectedNote = null })
+    notes.find { it.id == selectedNoteId }?.let { n ->
+        NoteDialog(note = n, onDismiss = { selectedNoteId = null })
     }
-}
-
-@Composable
-private fun NoteDialog(note: Note, onDismiss: () -> Unit) {
-    val ctx = LocalContext.current
-    val player = remember { MediaPlayer() }
-    var playing by remember { mutableStateOf(false) }
-
-    DisposableEffect(note.id) {
-        onDispose {
-            runCatching { player.stop() }
-            player.release()
-        }
-    }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Note") },
-        text = {
-            Text(note.text ?: if (note.voicePath != null) "Voice memo" else "(empty)")
-        },
-        confirmButton = {
-            if (note.voicePath != null) {
-                Button(onClick = {
-                    if (playing) {
-                        runCatching { player.stop() }
-                        player.reset()
-                        playing = false
-                    } else {
-                        runCatching {
-                            player.reset()
-                            player.setDataSource(note.voicePath)
-                            player.prepare()
-                            player.setOnCompletionListener { playing = false }
-                            player.start()
-                            playing = true
-                        }
-                    }
-                }) {
-                    Text(if (playing) "Stop" else "Play voice")
-                }
-            } else {
-                TextButton(onClick = onDismiss) { Text("Close") }
-            }
-        },
-        dismissButton = if (note.voicePath != null) {
-            { TextButton(onClick = onDismiss) { Text("Close") } }
-        } else null,
-    )
 }

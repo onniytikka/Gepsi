@@ -1,17 +1,24 @@
 package com.gepsi.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.util.UUID
 
-@Entity(tableName = "route")
+@Entity(
+    tableName = "route",
+    indices = [Index(value = ["uuid"], unique = true)],
+)
 data class Route(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
     val startTs: Long,
     val endTs: Long? = null,
     val synced: Boolean = false,
+    // Stable identity across devices, used to deduplicate package imports.
+    @ColumnInfo(defaultValue = "") val uuid: String = UUID.randomUUID().toString(),
 )
 
 @Entity(

@@ -27,6 +27,12 @@ interface RouteDao {
     @Query("SELECT * FROM route ORDER BY startTs DESC")
     fun observeAll(): Flow<List<Route>>
 
+    @Query("SELECT * FROM route ORDER BY startTs ASC")
+    suspend fun listAll(): List<Route>
+
+    @Query("SELECT uuid FROM route")
+    suspend fun allUuids(): List<String>
+
     @Query("SELECT * FROM route WHERE synced = 0")
     suspend fun unsynced(): List<Route>
 }

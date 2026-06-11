@@ -17,7 +17,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -74,6 +77,7 @@ fun AllRoutesScreen(onBack: () -> Unit) {
     val ctx = LocalContext.current
     val vm: AllRoutesViewModel = viewModel()
     val bundles by vm.bundles.collectAsStateWithLifecycle()
+    var selectedNoteId by rememberSaveable { mutableStateOf<Long?>(null) }
 
     val mapView = remember {
         MapView(ctx).apply {
@@ -109,6 +113,10 @@ fun AllRoutesScreen(onBack: () -> Unit) {
                     setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                     title = n.text ?: "Voice note"
                     snippet = bundle.route.name
+                    setOnMarkerClickListener { _, _ ->
+                        selectedNoteId = n.id
+                        true
+                    }
                 }
                 mapView.overlays.add(m)
             }
@@ -142,6 +150,10 @@ fun AllRoutesScreen(onBack: () -> Unit) {
         ) {
             AndroidView(factory = { mapView }, modifier = Modifier.fillMaxSize())
         }
+    }
+
+    bundles.flatMap { it.notes }.find { it.id == selectedNoteId }?.let { n ->
+        NoteDialog(note = n, onDismiss = { selectedNoteId = null })
     }
 }
 

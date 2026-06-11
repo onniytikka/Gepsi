@@ -22,6 +22,14 @@ class GepsiRepository(
 
     suspend fun getRoute(id: Long): Route? = routes.get(id)
 
+    suspend fun allRoutes(): List<Route> = routes.listAll()
+
+    suspend fun existingRouteUuids(): Set<String> = routes.allUuids().toSet()
+
+    suspend fun insertRoute(route: Route): Long = routes.insert(route)
+
+    suspend fun insertPoint(point: TrackPoint): Long = points.insert(point)
+
     suspend fun pointsForRoute(id: Long): List<TrackPoint> = points.listByRoute(id)
 
     suspend fun notesForRoute(id: Long): List<Note> = notes.listByRoute(id)

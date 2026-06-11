@@ -2,6 +2,7 @@ package com.gepsi
 
 import android.app.Application
 import android.content.Context
+import com.gepsi.audio.AudioPlaybackController
 import com.gepsi.data.GepsiDatabase
 import com.gepsi.data.GepsiRepository
 import com.gepsi.sync.GepsiApi
@@ -13,6 +14,8 @@ class GepsiApp : Application() {
 
     lateinit var repository: GepsiRepository
         private set
+
+    val audioPlayer by lazy { AudioPlaybackController() }
 
     var api: GepsiApi? = null
         private set

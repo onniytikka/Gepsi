@@ -1,8 +1,10 @@
 name: Release APK
 
+# Optional automation: builds and publishes a signed APK as a GitHub Release.
+# Requires GEPSI_KEYSTORE_BASE64 / GEPSI_KEYSTORE_PASSWORD repo secrets, so it
+# only runs when triggered manually. Day-to-day releases are done by committing
+# the locally built APK to apk/gepsi.apk instead.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 # Minimal permissions by default — jobs opt in to what they need.

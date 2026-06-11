@@ -47,6 +47,7 @@ android/build/
 android/app/build/
 android/captures/
 *.apk
+!apk/gepsi.apk
 *.aab
 *.iml
 .cxx/

@@ -1,0 +1,64 @@
+name: Release APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Minimal permissions by default — jobs opt in to what they need.
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Build and publish APK
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - name: Decode signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.GEPSI_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.GEPSI_KEYSTORE_PASSWORD }}
+        run: |
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > android/gepsi-release.jks
+          {
+            echo "storeFile=gepsi-release.jks"
+            echo "storePassword=$KEYSTORE_PASSWORD"
+            echo "keyAlias=gepsi"
+            echo "keyPassword=$KEYSTORE_PASSWORD"
+          } > android/keystore.properties
+
+      - name: Build release APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew :app:assembleRelease
+
+      - name: Publish rolling "latest" release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cp android/app/build/outputs/apk/release/app-release.apk gepsi.apk
+          version=$(grep -oP 'versionName = "\K[^"]+' android/app/build.gradle.kts)
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest gepsi.apk \
+            --target "$GITHUB_SHA" \
+            --title "Gepsi v$version (latest from main)" \
+            --notes "Auto-built from \`$GITHUB_SHA\`. Download **gepsi.apk** on your Android phone and open it to install (allow installs from your browser if asked)."

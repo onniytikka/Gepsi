@@ -2,6 +2,10 @@
 
 GPS walking-trail recorder for Android with location-tagged text + voice notes. Local-first storage in Room, optional sync to a Flask backend.
 
+## Download
+
+**[⬇ Download the latest APK](https://github.com/onniytikka/Gepsi/releases/latest/download/gepsi.apk)** — built automatically from every push to `main`. Open the file on your Android phone to install (allow installs from your browser if asked).
+
 ## Repo layout
 
 - `android/` — Android Studio project (Kotlin + Jetpack Compose, osmdroid maps, foreground tracking service).
@@ -39,7 +43,7 @@ The backend base URL is wired into `BuildConfig.BACKEND_URL` via `android/gradle
 
 ## CI/CD
 
-GitHub Actions at `.github/workflows/ci.yml` runs secret scan, dependency review, and CodeQL on every push / PR to `main`. See repo's CI section for details.
+GitHub Actions at `.github/workflows/ci.yml` runs secret scan, dependency review, and an Android debug build + lint on every push / PR to `main`. `.github/workflows/release.yml` builds a signed release APK on every push to `main` and publishes it to the rolling [`latest` release](https://github.com/onniytikka/Gepsi/releases/latest) (signing keystore comes from the `GEPSI_KEYSTORE_BASE64` / `GEPSI_KEYSTORE_PASSWORD` repo secrets).
 
 ## Security
 
